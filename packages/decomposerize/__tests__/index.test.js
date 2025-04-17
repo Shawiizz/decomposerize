@@ -77,7 +77,7 @@ test('basic docker create command', () => {
             image: 'foobar/baz:latest'
   `;
 
-    expect(Decomposerize(compose, { command: 'docker create' })).toMatchInlineSnapshot(
+    expect(Decomposerize(compose, { dockerRunCommand: 'docker create' })).toMatchInlineSnapshot(
         '"docker create -p 80:80 foobar/baz:latest"',
     );
 });
@@ -206,8 +206,8 @@ test('with equal and long for argument values', () => {
 
     expect(
         Decomposerize(compose, {
-            rm: true,
-            detach: true,
+            dockerRunRm: true,
+            dockerRunDetach: true,
             'long-args': true,
             'arg-value-separator': '=',
         }),
@@ -224,8 +224,8 @@ test('--rm -d', () => {
 
     expect(
         Decomposerize(compose, {
-            rm: true,
-            detach: true,
+            dockerRunRm: true,
+            dockerRunDetach: true,
         }),
     ).toMatchInlineSnapshot('"docker run --rm -d ubuntu"');
 });

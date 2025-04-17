@@ -16,9 +16,14 @@ const getObjectByPath = (path: string, obj: any): any =>
 export type ArgValueSeparator = '=' | ' ';
 
 export type Configuration = {
-    command?: string,
-    rm?: boolean,
-    detach?: boolean,
+    services?: string[],
+    stopAndRemoveContainers?: boolean,
+    createVolumes?: boolean,
+    createNetworks?: boolean,
+    dockerRun?: boolean,
+    dockerRunCommand?: string,
+    dockerRunRm?: boolean,
+    dockerRunDetach?: boolean,
     multiline?: boolean,
     'long-args'?: boolean,
     'arg-value-separator'?: ArgValueSeparator,
@@ -33,14 +38,30 @@ export default (input: string, configuration: Configuration = {}): ?string => {
     }
 
     const defaultConfiguration = {
-        command: 'docker run',
-        rm: false,
-        detach: false,
+        stopAndRemoveContainers: false,
+        services: [],
+        createVolumes: false,
+        createNetworks: false,
+        dockerRun: false,
+        dockerRunCommand: 'docker run',
+        dockerRunRm: false,
+        dockerRunDetach: false,
         multiline: false,
         'long-args': false,
         'arg-value-separator': ' ',
     };
     const config = Object.assign(defaultConfiguration, configuration);
+
+    // Remove services not in the list (empty list means all services will be included)
+    if (config.services.length > 0) {
+        const filteredServices = {};
+        Object.entries(composeJson.services).forEach(([serviceName, serviceConfig]) => {
+            if (config.services.includes(serviceName)) {
+                filteredServices[serviceName] = serviceConfig;
+            }
+        });
+        composeJson.services = filteredServices;
+    }
 
     const stringify = (value: any): string => {
         const stringValue = String(value);
@@ -64,7 +85,9 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         else commandOptions.push(`${dash}${argument}`);
     };
 
+    // Networks
     Object.entries(composeJson.networks || []).forEach(([networkName, network]) => {
+        if (!config.createNetworks) return;
         const commandOptions = [];
 
         const pushOptionAndName = (argumentNames: string, value: String | string) =>
@@ -107,7 +130,9 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         );
     });
 
+    // Volumes
     Object.entries(composeJson.volumes || []).forEach(([volumeName, volume]) => {
+        if (!config.createVolumes) return;
         const commandOptions = [];
 
         const pushOptionAndName = (argumentNames: string, value: String | string) =>
@@ -131,14 +156,22 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         );
     });
 
+    // Remove previous containers with same name
+    Object.entries(composeJson.services || []).forEach(([serviceName, service]) => {
+        if (!config.stopAndRemoveContainers) return;
+        commands.push(`docker stop ${serviceName}`.replace(/[ ]+/g, ' '));
+        commands.push(`docker rm ${serviceName}`.replace(/[ ]+/g, ' '));
+    });
+
     Object.entries(composeJson.services).forEach(([, service]) => {
+        if (!config.dockerRun) return;
         const commandOptions = [];
 
         const pushOptionAndName = (argumentNames: string, value: String | string) =>
             pushOptionAndNameToCommand(commandOptions, argumentNames, value);
 
-        if (config.rm === true) commandOptions.push('--rm');
-        if (config.detach === true) commandOptions.push(config['long-args'] ? '--detach' : '-d');
+        if (config.dockerRunRm === true) commandOptions.push('--rm');
+        if (config.dockerRunDetach === true) commandOptions.push(config['long-args'] ? '--detach' : '-d');
 
         const networkMode = getObjectByPath('network_mode', service);
         const networks = getObjectByPath('networks', service);
@@ -256,7 +289,10 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         if (service.command) commandOptions.push(service.command);
 
         commands.push(
-            `${config.command} ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '),
+            `${config.dockerRunCommand} ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(
+                /[ ]+/g,
+                ' ',
+            ),
         );
     });
 

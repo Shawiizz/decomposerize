@@ -339,7 +339,7 @@ test('command args (https://github.com/magicmark/composerize/issues/484)', () =>
                 image: 'mcr.microsoft.com/iotedge/opc-plc:latest'
                 command: '--pn=50000 --autoaccept --nospikes --nodips --nopostrend --nonegtrend --nodatavalues --sph --sn=25 --sr=10 --st=uint --fn=5 --fr=1 --ft=uint'
     `,
-            { rm: true },
+            { dockerRunRm: true },
         ),
     ).toMatchInlineSnapshot(
         '"docker run --rm -i -t -p 50000:50000 -p 8080:8080 --name opcplc mcr.microsoft.com/iotedge/opc-plc:latest --pn=50000 --autoaccept --nospikes --nodips --nopostrend --nonegtrend --nodatavalues --sph --sn=25 --sr=10 --st=uint --fn=5 --fr=1 --ft=uint"',
@@ -355,7 +355,7 @@ test('basic image (https://github.com/magicmark/composerize/issues/542)', () => 
             ubuntu:
                 image: ubuntu
     `,
-            { detach: true },
+            { dockerRunDetach: true },
         ),
     ).toMatchInlineSnapshot('"docker run -d ubuntu"');
 });
@@ -524,7 +524,7 @@ test('port', () => {
                     - NEO4J_AUTH=neo4j/test
                 image: 'neo4j:latest'
     `,
-            { detach: true },
+            { dockerRunDetach: true },
         ),
     ).toMatchInlineSnapshot(
         '"docker run -d --name testneo4j -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -v $HOME/neo4j/logs:/logs -v $HOME/neo4j/import:/var/lib/neo4j/import -v $HOME/neo4j/plugins:/plugins -e NEO4J_AUTH=neo4j/test neo4j:latest"',
@@ -560,7 +560,7 @@ test('ip, mac, hostname, network (https://github.com/magicmark/composerize/issue
                 external:
                     name: homenet
     `,
-            { detach: true },
+            { dockerRunDetach: true },
         ),
     ).toMatchInlineSnapshot(
         `
@@ -641,7 +641,7 @@ test('cap_add, cap_drop, pid, net, prviledged, device (https://github.com/magicm
                 image: 'storageos/node:0.10.0'
                 command: server
     `,
-            { detach: true },
+            { dockerRunDetach: true },
         ),
     ).toMatchInlineSnapshot(
         '"docker run -d --net host --name storageos -e HOSTNAME -e ADVERTISE_IP=xxx.xxx.xxx.xxx -e JOIN=xxxxxxxxxxxxxxxxx --pid host --privileged --cap-add SYS_ADMIN --cap-drop XXX --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins storageos/node:0.10.0 server"',
