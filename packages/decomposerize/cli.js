@@ -11,6 +11,7 @@ const config = {
     services: [],
     createVolumes: false,
     createNetworks: false,
+    dockerBuild: false,
     dockerRun: false,
     dockerRunRm: false,
     dockerRunDetach: false,
@@ -26,20 +27,19 @@ if (args.includes('--help') || args.includes('-h')) {
     console.log('Options:');
     console.log('  --help, -h                  Displays this help message.');
     console.log(
-        '  --docker-run                A boolean that, when true, adds the `docker run` command to the output. The default is false.',
+        '  --services=service1,service2          A list of services to include in the command line arguments. The default value is all services.',
     );
+    console.log('  --docker-run                Adds the `docker run` command to the output. The default is false.');
     console.log(
         "  --docker-run-command=<cmd>     A string that defines the Docker command to generate (e.g., 'docker run', 'docker create', 'docker container run'). It has a default value of 'docker run'.",
     );
     console.log(
-        "  --docker-run-rm                A boolean that, when true, adds the '--rm' option to the command line arguments. The default is false.",
+        "  --docker-run-rm                Adds the '--rm' option to the command line arguments. The default is false.",
     );
     console.log(
-        "  --docker-run-detach            A boolean that, when true, adds the '-d' option to the command line arguments. The default is false.",
+        "  --docker-run-detach            Adds the '-d' option to the command line arguments. The default is false.",
     );
-    console.log(
-        '  --services=service1,service2          A list of services to include in the command line arguments. The default value is all services.',
-    );
+    console.log('  --docker-build               Adds the `docker build` command to the output. The default is false.');
     console.log('  --stop-and-remove   Displays docker stop and docker rm command for your containers.');
     console.log('  --create-volumes    Displays `docker volume create` commands.');
     console.log('  --create-networks   Displays `docker network create` commands.');
@@ -61,6 +61,8 @@ args.forEach((arg) => {
 
         if (option === 'docker-run-command' && value) {
             config.dockerRunCommand = value;
+        } else if (option === 'docker-build') {
+            config.dockerBuild = true;
         } else if (option === 'docker-run') {
             config.dockerRun = true;
         } else if (option === 'docker-run-rm') {

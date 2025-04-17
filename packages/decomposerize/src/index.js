@@ -20,6 +20,7 @@ export type Configuration = {
     stopAndRemoveContainers?: boolean,
     createVolumes?: boolean,
     createNetworks?: boolean,
+    dockerBuild?: boolean,
     dockerRun?: boolean,
     dockerRunCommand?: string,
     dockerRunRm?: boolean,
@@ -42,6 +43,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         services: [],
         createVolumes: false,
         createNetworks: false,
+        dockerBuild: false,
         dockerRun: false,
         dockerRunCommand: 'docker run',
         dockerRunRm: false,
@@ -159,8 +161,27 @@ export default (input: string, configuration: Configuration = {}): ?string => {
     // Remove previous containers with same name
     Object.entries(composeJson.services || []).forEach(([serviceName, service]) => {
         if (!config.stopAndRemoveContainers) return;
-        commands.push(`docker stop ${serviceName}`.replace(/[ ]+/g, ' '));
-        commands.push(`docker rm ${serviceName}`.replace(/[ ]+/g, ' '));
+        commands.push(`docker stop ${service.container_name || serviceName}`.replace(/[ ]+/g, ' '));
+        commands.push(`docker rm ${service.container_name || serviceName}`.replace(/[ ]+/g, ' '));
+    });
+
+    // Docker build
+    Object.entries(composeJson.services || []).forEach(([serviceName, service]) => {
+        if (!config.dockerBuild || !service?.build?.dockerfile) return;
+        const commandOptions = [];
+
+        const pushOptionAndName = (argumentNames: string, value: String | string) =>
+            pushOptionAndNameToCommand(commandOptions, argumentNames, value);
+
+        if (service.build) {
+            if (service.build.dockerfile)
+                pushOptionAndName('f', `${service.build?.context || '.'}/${service.build.dockerfile}`);
+        }
+
+        // $FlowFixMe
+        commandOptions.push(service?.image || serviceName);
+
+        commands.push(`docker build ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '));
     });
 
     Object.entries(composeJson.services).forEach(([, service]) => {
