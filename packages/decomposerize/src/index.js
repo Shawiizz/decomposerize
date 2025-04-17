@@ -174,12 +174,12 @@ export default (input: string, configuration: Configuration = {}): ?string => {
             pushOptionAndNameToCommand(commandOptions, argumentNames, value);
 
         if (service.build) {
-            if (service.build.dockerfile)
-                pushOptionAndName('f', `${service.build?.context || '.'}/${service.build.dockerfile}`);
-        }
+            if (service.build.dockerfile) pushOptionAndName('f', service.build.dockerfile);
 
-        // $FlowFixMe
-        commandOptions.push(service?.image || serviceName);
+            pushOptionAndName('t', `"${service?.image || `${serviceName}:latest`}"`);
+
+            commandOptions.push(service.build?.context || '.');
+        }
 
         commands.push(`docker build ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '));
     });
