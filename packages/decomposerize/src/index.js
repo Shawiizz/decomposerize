@@ -25,10 +25,17 @@ export type Configuration = {
     dockerRunCommand?: string,
     dockerRunRm?: boolean,
     dockerRunDetach?: boolean,
+    ansibleEnvVarsFormat?: boolean,
     multiline?: boolean,
     'long-args'?: boolean,
     'arg-value-separator'?: ArgValueSeparator,
 };
+
+function transformEnvVarsToAnsibleFormat(command: string) {
+    return command.replace(/\$\{([^}]+)\}/g, (_, varName) => {
+        return `{{ lookup('ansible.builtin.env', '${varName}') }}`;
+    });
+}
 
 export default (input: string, configuration: Configuration = {}): ?string => {
     const composeJson = Composeverter.yamlParse(Composeverter.migrateToCommonSpec(input));
@@ -48,6 +55,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         dockerRunCommand: 'docker run',
         dockerRunRm: false,
         dockerRunDetach: false,
+        ansibleEnvVarsFormat: false,
         multiline: false,
         'long-args': false,
         'arg-value-separator': ' ',
@@ -317,5 +325,5 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         );
     });
 
-    return commands.join('\n');
+    return config.ansibleEnvVarsFormat ? commands.map(transformEnvVarsToAnsibleFormat).join('\n') : commands.join('\n');
 };
