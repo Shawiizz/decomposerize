@@ -15,6 +15,7 @@ const config = {
     dockerRun: false,
     dockerRunRm: false,
     dockerRunDetach: false,
+    deleteImages: false,
     ansibleEnvVarsFormat: false,
     multiline: false,
     'long-args': false,
@@ -44,6 +45,7 @@ if (args.includes('--help') || args.includes('-h')) {
     console.log('  --stop-and-remove   Displays docker stop and docker rm command for your containers.');
     console.log('  --create-volumes    Displays `docker volume create` commands.');
     console.log('  --create-networks   Displays `docker network create` commands.');
+    console.log('  --delete-images   Displays `docker rmi` commands to delete images of a repository.');
     console.log(
         '  --ansible-env-vars-format  A boolean that, when true, emits the command in Ansible environment variables format. The default value is false.',
     );
@@ -81,6 +83,8 @@ args.forEach((arg) => {
             config.createVolumes = true;
         } else if (option === 'create-networks') {
             config.createNetworks = true;
+        } else if (option === 'delete-images') {
+            config.deleteImages = true;
         } else if (option === 'ansible-env-vars-format') {
             config.ansibleEnvVarsFormat = true;
         } else if (option === 'multiline') {

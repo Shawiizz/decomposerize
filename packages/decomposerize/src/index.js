@@ -25,13 +25,14 @@ export type Configuration = {
     dockerRunCommand?: string,
     dockerRunRm?: boolean,
     dockerRunDetach?: boolean,
+    deleteImages?: boolean,
     ansibleEnvVarsFormat?: boolean,
     multiline?: boolean,
     'long-args'?: boolean,
     'arg-value-separator'?: ArgValueSeparator,
 };
 
-function transformEnvVarsToAnsibleFormat(command: string) {
+function transformEnvVarsToAnsibleFormat(command: string): string {
     return command.replace(/\$\{([^}]+)\}/g, (_, varName) => {
         return `{{ lookup('ansible.builtin.env', '${varName}') }}`;
     });
@@ -55,6 +56,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         dockerRunCommand: 'docker run',
         dockerRunRm: false,
         dockerRunDetach: false,
+        deleteImages: false,
         ansibleEnvVarsFormat: false,
         multiline: false,
         'long-args': false,
@@ -173,6 +175,12 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         commands.push(`docker rm ${service.container_name || serviceName}`.replace(/[ ]+/g, ' '));
     });
 
+    // Remove images of the same repository
+    Object.entries(composeJson.services || []).forEach(([serviceName, service]) => {
+        if (!config.deleteImages) return;
+        commands.push(`docker rmi $(docker images ${service.image.split(':')[0]} -q)`.replace(/[ ]+/g, ' '));
+    });
+
     // Docker build
     Object.entries(composeJson.services || []).forEach(([serviceName, service]) => {
         if (!config.dockerBuild || !service?.build?.dockerfile) return;
@@ -253,7 +261,11 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                         pushOption(stringify(targetValue));
                     } else {
                         Object.entries(targetValue).forEach(([k, v]) => {
-                            pushOption(v !== null ? `${k}=${stringify(v)}` : k);
+                            pushOption(
+                                v !== null
+                                    ? `${k}=${config.ansibleEnvVarsFormat ? '"' : ''}${stringify(v)}${config.ansibleEnvVarsFormat ? '"' : ''}`
+                                    : k,
+                            );
                         });
                     }
                 }
