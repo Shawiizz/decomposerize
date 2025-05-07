@@ -171,8 +171,9 @@ export default (input: string, configuration: Configuration = {}): ?string => {
     // Remove previous containers with same name
     Object.entries(composeJson.services || []).forEach(([serviceName, service]) => {
         if (!config.stopAndRemoveContainers) return;
-        commands.push(`docker stop ${service.container_name || serviceName}`.replace(/[ ]+/g, ' '));
-        commands.push(`docker rm ${service.container_name || serviceName}`.replace(/[ ]+/g, ' '));
+        const imageRepository = service.image.split(':')[0];
+        commands.push(`docker stop ${service.container_name || imageRepository}`.replace(/[ ]+/g, ' '));
+        commands.push(`docker rm ${service.container_name || imageRepository}`.replace(/[ ]+/g, ' '));
     });
 
     // Remove images of the same repository
