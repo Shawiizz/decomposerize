@@ -325,7 +325,12 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         });
 
         // $FlowFixMe
-        commandOptions.push(service.image);
+        commandOptions.push(service.image);                
+        
+        // Set container name if not set (using image name by default)
+        if(!commandOptions.find(opt => opt.startsWith('--name'))) {            
+            commandOptions.unshift(`--name ${service.container_name || service.image.split(':')[0]}`);
+        }
 
         // $FlowFixMe
         if (service.command) commandOptions.push(service.command);
