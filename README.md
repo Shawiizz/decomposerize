@@ -1,6 +1,5 @@
 # decomposerize
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/bebf915c-cdd7-4800-9179-d1f4031b0848/deploy-status)](https://app.netlify.com/sites/decomposerize/deploys)
 [![npm](https://img.shields.io/npm/v/decomposerize.svg)](https://www.npmjs.com/package/decomposerize)
 [![ShareVB on GitHub](https://img.shields.io/badge/ShareVB-100000?logo=github&logoColor=white)](https://github.com/sharevb)
             
@@ -20,11 +19,7 @@ decomposerize can be run in the cli.
 $ decomposerize << docker-compose.yml
 ```
 
-## Docker image
-
-A dockker image of composerize, decomposerize and composeverter websites is available here: https://github.com/Oaklight/composerize-minimal/blob/master/README_en.md (thanks to @Oaklight)
-
-## API
+# API
 
 **convertToDockerRunCommands(dockerComposeContent, configuration={})**
 
@@ -41,7 +36,7 @@ A dockker image of composerize, decomposerize and composeverter websites is avai
 
 It returns the Docker run command(s) generated based on the input Docker Compose file and the provided configuration
 
-### How to use with node.js
+# How to use with node.js
 
 Make sure to install the `composerize` package in your project by running:
 
@@ -82,6 +77,10 @@ console.log(dockerRunCommands);
 - [Clone a fork of the repo](https://guides.github.com/activities/forking/) and install the project dependencies by running `yarn`
 - Make your changes, and build the project by running `make build`
 - Test your changes with `make test`
+
+### yarn version
+
+Needs yarn@1.19.1. See https://github.com/yarnpkg/yarn/issues/7734.
 
 ## Maintainers
 

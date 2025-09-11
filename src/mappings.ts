@@ -1,23 +1,9 @@
-// @flow
-
 // Define the "types" of data a docker cli flag can represent in yaml.
 export type ArgType =
-    // Used for lists of things
-    // e.g. --device (https://docs.docker.com/compose/compose-file/#devices)
     | 'Array'
     | 'ArrayAutoRepair'
-
-    // Used to store a "limits" value of the input format: <type>=<soft limit>[:<hard limit>]
-    // e.g. --ulimit
-    // @see https://docs.docker.com/compose/compose-file/#ulimits
-    // @see https://docs.docker.com/engine/reference/commandline/run/#set-ulimits-in-container---ulimit
     | 'Ulimits'
-
-    // Used to store a boolean value for an option
-    // e.g. --privileged (https://docs.docker.com/compose/compose-file/#domainname-hostname-ipc-mac_address-privileged-read_only-shm_size-stdin_open-tty-user-working_dir)
     | 'Switch'
-
-    // Used to store an arbitrary text value for an option
     | 'Value'
     | 'IntValue'
     | 'FloatValue'
@@ -29,18 +15,15 @@ export type ArgType =
     | 'Gpus';
 
 // Type to represent the structure of the docker compose mapping
-export type Mapping = {
-    type: ArgType,
-    path: string,
-};
+export interface Mapping {
+    type: ArgType;
+    path: string;
+}
 
-export const getMapping = (type: ArgType, path: string): Mapping => ({
-    type,
-    path,
-});
+export const getMapping = (type: ArgType, path: string): Mapping => ({ type, path });
 
 // docker cli -> docker-compose options
-export const MAPPINGS: { [string]: Mapping } = {
+export const MAPPINGS: Record<string, Mapping> = {
     'add-host': getMapping('Array', 'extra_hosts'),
     'blkio-weight': getMapping('IntValue', 'blkio_config/weight'),
     'blkio-weight-device': getMapping('DeviceBlockIOConfigWeight', 'blkio_config/weight_device'),
