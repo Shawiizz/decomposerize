@@ -103,7 +103,10 @@ args.forEach((arg) => {
   }
 });
 
-if (require.main === module) {
+// Check if this is the main module being executed
+const isMainModule = require.main === module || process.argv[1] === __filename || process.argv[1].endsWith('decomposerize.js');
+
+if (isMainModule) {
   if (args.length > 0 && !args[0].startsWith('--')) {
     const filePath = args[0];
     try {
@@ -113,7 +116,7 @@ if (require.main === module) {
       console.error(`Error: ${error.message}`);
       process.exit(1);
     }
-  } else {
+    } else {
     let composeFile = '';
     process.stdin
       .on('data', function (data) {

@@ -12,5 +12,5 @@
     "outDir": "dist-temp",
   "types": ["node"]
   },
-  "include": ["src/**/*", "cli.js"]
+  "include": ["src/**/*"]
 }
