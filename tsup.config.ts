@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: { decomposerize: 'src/index.ts' },
+  entry: { decomposerize: 'src/cli.ts' },
   format: ['cjs'],
   dts: false,
   sourcemap: false,

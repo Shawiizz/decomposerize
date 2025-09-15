@@ -10,7 +10,7 @@
     "allowJs": true,
     "checkJs": false,
     "outDir": "dist-temp",
-    "types": []
+  "types": ["node"]
   },
   "include": ["src/**/*", "cli.js"]
 }
