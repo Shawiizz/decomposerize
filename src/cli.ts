@@ -103,28 +103,24 @@ args.forEach((arg) => {
   }
 });
 
-// Check if this is the main module being executed
-const isMainModule = require.main === module || process.argv[1] === __filename || process.argv[1].endsWith('decomposerize.js');
-
-if (isMainModule) {
-  if (args.length > 0 && !args[0].startsWith('--')) {
-    const filePath = args[0];
-    try {
-      const composeFile = fs.readFileSync(path.resolve(filePath), 'utf8');
-      console.log(decomposerize(composeFile, config as any));
-    } catch (error: any) {
-      console.error(`Error: ${error.message}`);
-      process.exit(1);
-    }
-    } else {
-    let composeFile = '';
-    process.stdin
-      .on('data', function (data) {
-        composeFile += data;
-      })
-      .on('end', function () {
-        console.log(decomposerize(composeFile, config as any));
-      })
-      .setEncoding('utf8');
+// Execute CLI logic
+if (args.length > 0 && !args[0].startsWith('--')) {
+  const filePath = args[0];
+  try {
+    const composeFile = fs.readFileSync(path.resolve(filePath), 'utf8');
+    console.log(decomposerize(composeFile, config as any));
+  } catch (error: any) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
   }
+} else {
+  let composeFile = '';
+  process.stdin
+    .on('data', function (data) {
+      composeFile += data;
+    })
+    .on('end', function () {
+      console.log(decomposerize(composeFile, config as any));
+    })
+    .setEncoding('utf8');
 }
