@@ -74,6 +74,10 @@ const decomposerize = (input: string, configuration: Configuration = {}): string
 
   // If composerize mode, return the modified YAML
   if (config.composerize) {
+    // Remove default name added by composeverter
+    if (composeJson.name === "<your project name>") {
+      delete composeJson.name;
+    }
     let yamlOutput = YAML.stringify(composeJson, { lineWidth: 0, nullStr: "" });
     if (config.ansibleEnvVarsFormat) {
       yamlOutput = transformEnvVarsToAnsibleFormat(yamlOutput);
