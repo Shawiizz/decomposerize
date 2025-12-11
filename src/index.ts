@@ -1,4 +1,5 @@
 import Composeverter from "composeverter";
+import YAML from "yaml";
 import { MAPPINGS } from "./mappings";
 import { environmentize } from "./environmentize";
 import { initConfig } from "./util/config";
@@ -27,6 +28,7 @@ export interface Configuration {
   "long-args"?: boolean;
   "arg-value-separator"?: ArgValueSeparator;
   environmentize?: boolean;
+  composerize?: boolean;
 }
 
 function transformEnvVarsToAnsibleFormat(command: string): string {
@@ -69,6 +71,15 @@ const decomposerize = (input: string, configuration: Configuration = {}): string
 
   // Apply environmentization to compose model if requested
   environmentize(config, composeJson);
+
+  // If composerize mode, return the modified YAML
+  if (config.composerize) {
+    let yamlOutput = YAML.stringify(composeJson, { lineWidth: 0, nullStr: "" });
+    if (config.ansibleEnvVarsFormat) {
+      yamlOutput = transformEnvVarsToAnsibleFormat(yamlOutput);
+    }
+    return yamlOutput;
+  }
 
   const pushOptionAndNameToCommand = (commandOptions: string[], argumentNames: string, value: String | string) => {
     let argument = argumentNames;

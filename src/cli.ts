@@ -58,6 +58,7 @@ const printHelp = () => {
     "  --arg-value-separator=<sep>  A string representing the separator used between command arguments and their values. It can be either ' ' (space) or '='. The default value is ' ' (space).",
   );
   console.log('  --environmentize     When set, suffix names with -${ENV} and tag images with :${VERSION}.');
+  console.log('  --composerize        When combined with --environmentize, outputs the modified docker-compose YAML instead of docker run commands.');
 };
 
 if (args.includes('--help') || args.includes('-h')) {
@@ -99,6 +100,8 @@ args.forEach((arg) => {
       (config as any)['arg-value-separator'] = value as any;
     } else if (option === 'environmentize') {
       (config as any).environmentize = true as any;
+    } else if (option === 'composerize') {
+      (config as any).composerize = true as any;
     }
   }
 });

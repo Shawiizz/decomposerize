@@ -37,7 +37,12 @@ export const environmentize = (config: Required<Configuration>, composeJson: any
       const newVolumes: Record<string, any> = {};
       Object.entries(composeJson.volumes).forEach(([volName, volConf]: [string, any]) => {
         const newName = withEnvSuffix(volName) as string;
-        const newConf: any = { ...(volConf || {}) };
+        // Preserve null values to avoid {} in output
+        if (volConf === null || volConf === undefined) {
+          newVolumes[newName] = null;
+          return;
+        }
+        const newConf: any = { ...volConf };
         if (newConf && typeof newConf === "object") {
           if (newConf.name) newConf.name = withEnvSuffix(newConf.name);
           if (newConf.external && typeof newConf.external === "object" && newConf.external.name) {

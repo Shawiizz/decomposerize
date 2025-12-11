@@ -16,7 +16,8 @@ export const initConfig = (configuration: Configuration) => {
     multiline: false,
     "long-args": false,
     "arg-value-separator": " ",
-    environmentize: false
+    environmentize: false,
+    composerize: false
   } as Required<Configuration>;
 
   return Object.assign({}, defaultConfiguration, configuration) as Required<Configuration>;
