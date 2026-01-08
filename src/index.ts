@@ -29,6 +29,8 @@ export interface Configuration {
   "arg-value-separator"?: ArgValueSeparator;
   environmentize?: boolean;
   composerize?: boolean;
+  environmentize_volumes?: boolean;
+  environmentize_networks?: boolean;
 }
 
 function transformEnvVarsToAnsibleFormat(command: string): string {

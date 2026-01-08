@@ -18,7 +18,7 @@ export const environmentize = (config: Required<Configuration>, composeJson: any
     };
 
     // Networks
-    if (composeJson.networks) {
+    if (config.environmentize_networks && composeJson.networks) {
       const newNetworks: Record<string, any> = {};
       Object.entries(composeJson.networks).forEach(([netName, netConf]: [string, any]) => {
         const newName = withEnvSuffix(netName) as string;
@@ -33,7 +33,7 @@ export const environmentize = (config: Required<Configuration>, composeJson: any
     }
 
     // Volumes
-    if (composeJson.volumes) {
+    if (config.environmentize_volumes && composeJson.volumes) {
       const newVolumes: Record<string, any> = {};
       Object.entries(composeJson.volumes).forEach(([volName, volConf]: [string, any]) => {
         const newName = withEnvSuffix(volName) as string;
@@ -93,7 +93,7 @@ export const environmentize = (config: Required<Configuration>, composeJson: any
       }
 
       // Networks references
-      if (service.networks) {
+      if (config.environmentize_networks && service.networks) {
         if (Array.isArray(service.networks)) {
           service.networks = service.networks.map((n: any) => (typeof n === "string" ? withEnvSuffix(n) : n));
         } else if (typeof service.networks === "object") {
@@ -107,7 +107,7 @@ export const environmentize = (config: Required<Configuration>, composeJson: any
       }
 
       // Volumes references (mounts) where named volume appears at the start before ':'
-      if (Array.isArray(service.volumes)) {
+      if (config.environmentize_volumes && Array.isArray(service.volumes)) {
         service.volumes = service.volumes.map((entry: any) => {
           if (typeof entry === "string") {
             const parts = entry.split(":");
